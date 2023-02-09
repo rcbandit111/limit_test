@@ -1,0 +1,72 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.11'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
+    id 'maven-publish'
+}
+
+group = 'com.ratelimiter'
+version = '0.0.1'
+sourceCompatibility = '17'
+
+ext {
+    set('springCloudVersion', "2021.0.4")
+    artifactory_contextUrl = "http://192.168.1.111/repository"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "${artifactory_contextUrl}/plugins-release"
+        allowInsecureProtocol = true
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'joda-time:joda-time:2.12.1'
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.jadira.usertype:usertype.core:7.0.0.CR1'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.4'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+bootJar {
+    enabled = false
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
